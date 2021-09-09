@@ -174,7 +174,7 @@
 					        var xhr=new XMLHttpRequest();
 					        xhr.open('POST',url,false);
 					        // 添加http头，发送信息至服务器时内容编码类型
-					        xhr.setRequestHeader('Content-Type','text/plain');
+					        xhr.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
 					        xhr.onreadystatechange=function(){
 					            if (xhr.readyState==4){
 					                if (xhr.status==200 || xhr.status==304){
@@ -219,8 +219,7 @@
 						//上下句要同时处理字幕和音频所以url与其他按钮不同
 						UI.lastPara.addEventListener("mousedown",function(){
 							console.log('切换上句字幕');
-							let curTime=getCurrentTime()+'last';
-							Ajax.post('/subSwitch',curTime=12,function(responseText){
+							Ajax.post('/subSwitch',getCurrentTime()+'last',function(responseText){
 								showSubtitle(responseText);
 							});
 						},false);

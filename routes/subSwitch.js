@@ -9,8 +9,9 @@ const fs=require('fs');
 router.post('/', function(req, res, next) {
     
     const currentTime=req.body;
+
+   // fs.readFile('')
    // const subtitle;
-   console.log(currentTime);
     res.send("字11幕");
 });
 
