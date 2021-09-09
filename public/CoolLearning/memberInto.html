@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1"/>
+		<title>CoolLearning</title>
+		<style >
+			html{
+				box-sizing: border-box;
+			}
+			body{
+				margin: 0 15%;
+				font-size: 100%;
+			}
+			p{
+				/* color: gray;	
+				font:italic bold 1.2em 2em serif; /* font-style font-weight font-varient font-size/line-height font-family|inherit*/
+				/* font-family: sans-serif;
+				margin-left: 100px;
+				text-align: left;
+				text-shadow: -.2em -.2em .15em silver;
+				box-sizing: content-box;
+				background:#c2f670;
+				
+				border: 55px solid;
+				overflow: auto;
+				border-image: url(img/border.png) 55 stretch; */ 
+			}
+			#Members{
+				width:200px;
+				height:330px;
+				border: 30px solid;
+				border-image: url(img/border.png) 55 stretch;
+				overflow:hidden;
+				position:relative;
+				margin:0 auto;
+			}
+			#Members img{
+				position:absolute;
+				cursor:pointer;
+			}
+			.nameIntr{
+				position: absolute;
+				bottom: 0px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				height: 30px;
+				width: 200px;
+			}
+			#name{
+				
+			}
+			/* #Members ul li{
+				float: left;
+			} */
+			/* #Members ul li a{
+				display: block;/* set it as block element so you can set the dimensions, padding... */
+			} */
+			/* #float{
+				float: right;
+			}
+			#clear{
+				clear: both;
+			} */
+			@media screen and (min-width: 481px){
+				
+			}
+			@media screen and (min-width:780px){
+				
+			}
+		</style>
+	</head>
+	<body>
+		<header>
+			<hgroup>
+				<h1>第六小组</h1>
+				<h2>组员介绍：</h2>
+			</hgroup>
+		</header>
+		<div id="Members">
+			<img src="img/members.jpg">
+			<span class="nameIntr">组员：<p id="name">李奕晨</p></span>
+		</div>
+	
+		<footer>
+			<!-- <p id="float"><small><em>&copy;2021 Jeremy Li.</em></small></p>
+			Written by Jeremy Li. (<time datetime="2012-09-01T 20:00-05:00" pubdate>September 1, 2012, 8pm EST</time>)
+			<address>江西科技师范大学</br>软件动漫学院 </address> -->
+		</footer>
+		
+		<script type="text/javascript">
+			var i=0;
+			document.getElementById("Members").onclick=function(){
+			 var myImg=document.querySelector("img");
+			 var name=document.getElementById("name");
+			 if (i>-4){
+			  i--;
+			 }else{
+			  i=0;
+			 }
+			  myImg.style.left=i*200 +"px";
+			  switch(i){
+				  case 0:name.innerText="李奕晨";break;
+				  case -1:name.innerText="李惠文";break;
+				  case -2:name.innerText="王玲玉";break;
+				  case -3:name.innerText="赖春龙";break;
+				  case -4:name.innerText="廖志俊";break;
+				  default:name.innerText="☺";
+			  }
+			}
+		</script>
+	</body>
+</html>

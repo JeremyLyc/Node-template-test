@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>2020-09-1</title>
+		<link rel="stylesheet" href="../../css/common.css">
+		<link rel="stylesheet" href="../../css/listening.css" />
+		<style>
+			#app{
+				
+			}
+			.mainui{
+			  display:flex;
+			  justify-content: space-around;
+			  border:1px solid #C9F ;
+			  border-radius:5%;
+			  box-sizing: border-box ;
+			  border-bottom: 3px solid whitesmoke;
+			  padding: 5px;;
+			  }
+			.myButton{
+			  cursor:pointer;
+			  padding:0.2em 0.5em;
+			  text-align:center;
+			  border: 1px solid grey;
+			  border-radius:5%;
+			  background:whitesmoke;
+			 }
+			.hitButton{
+				background:antiquewhite;
+			 }
+			#unknow{
+				height: 10%;
+				background:limegreen;
+				color: white;
+				border-radius:3%;
+				display:flex;
+				text-align: center;
+				justify-content: center;
+				flex-direction: column;
+			 }
+			 
+			.audioPlayer{
+				width: 99%;
+			  }
+			#playerContainer{
+				display: flex;
+				justify-content: space-around;
+			}  
+			
+			#rateMenu{
+				text-align: center;
+				position: relative;
+				line-height: 40px;
+				width: 120px;
+			}
+			#rateMenu li  {
+				position: absolute;
+				width: 120px;
+				float: left;
+			}
+			#rateMenu ul{
+				display:none;
+			}
+			#subtitleLine{
+				line-height: 50px;
+				width: 100%;
+				color: #1AAD19;
+				border-bottom: 3px solid whitesmoke;
+			}
+			#learningArea p{
+				line-height: 40px;
+				width: 100%;
+				border-bottom: 3px solid whitesmoke;
+			}
+		</style>
+
+		<script type="text/javascript">	
+				var UI={
+					init:function(){
+						this.body=document.body;
+						this.app = document.getElementById("app");
+						this.unknow=document.getElementById("unknow");
+						this.playContainer=document.getElementById("playerContainer");
+						this.mainPlayer=document.getElementById("mainPlayer");
+						this.lastPara=document.getElementById("lastPara");
+						this.nextPara=document.getElementById("nextPara");
+						this.subSwitch=document.getElementById("subSwitch");
+						this.rateMenu=document.getElementById("rateMenu");
+						this.rateSwitch=document.getElementById("rateSwitch");
+						this.rateList=document.getElementById("rateList");
+						this.lowRate=document.getElementById("lowRate");
+						this.normalRate=document.getElementById("normalRate");
+						this.fastRate=document.getElementById("fastRate");
+						this.subtitleLine=document.getElementById("subtitleLine");
+						this.learningArea=document.getElementById("learningArea");
+					}
+				}
+				var Model={
+					clock: undefined ,
+					init:function(){
+						var body=UI.body;
+						var app=UI.app;
+						body.style.width= window.innerWidth  + "px" ;
+						body.style.height= window.innerHeight +"px"
+						app.style.height=body.style.height;
+						let myButton = document.getElementsByClassName("myButton") ;
+						for (let i=0; i < myButton.length ; i++){
+						   let bt = myButton[i];
+							bt.addEventListener("mousedown",function(){
+								  this.className += " hitButton" ;
+							} ,false);
+							bt.addEventListener("mouseup",function(o){
+								o = this ;
+								 setTimeout(function(){o.className = "myButton"},200);
+							} ,false);								 
+						}
+						
+						UI.unknow.addEventListener("mousedown",function(){
+							this.style.backgroundColor="green";
+							} ,false);
+						UI.unknow.addEventListener("mouseup",function(){
+							this.style.backgroundColor="limegreen";
+						} ,false);	
+						
+						//倍速按钮处理
+						var li=UI.rateList.children;
+						//console.log(li.length);
+						for(var j=0;j<li.length;j++){
+							console.log(li[j].style.height);
+							li[j].style.top=(j+1)*40+'px';
+						}
+						
+						var lis = UI.rateMenu.children;  //获取3个li
+						for (var i=0;i<lis.length;i++){
+							
+							//鼠标经过，出现下拉菜单
+							lis[i].onmouseover=function(){
+								this.children[1].style.display='block';
+							}
+							//鼠标离开，隐藏下拉菜单
+							lis[i].onmouseout=function(){
+								this.children[1].style.display='none';
+							}
+						}
+						
+					//end of init
+					}
+				}//end of model
+				window.onload=function(){
+					UI.init();
+					Model.init();
+					UI.body.style.height=window.innerHeight+'px';
+					UI.body.style.width=window.innerWidth+'px';
+
+					var Ajax = {
+					    get: function(url,callback){
+					        // XMLHttpRequest对象用于在后台与服务器交换数据
+					        var xhr=new XMLHttpRequest();
+					        xhr.open('GET',url,false);
+					        xhr.onreadystatechange=function(){
+					            // readyState == 4说明请求已完成
+					            if(xhr.readyState==4){
+					                if(xhr.status==200 || xhr.status==304){
+					                    console.log(xhr.responseText);
+					                    callback(xhr.responseText);
+					                }
+					            }
+					        }
+					        xhr.send();
+					    },
+					    // data应为'a=a1&b=b1'这种字符串格式，在jq里如果data为对象会自动将对象转成这种字符串格式
+					    post: function(url,data,callback){
+					        var xhr=new XMLHttpRequest();
+					        xhr.open('POST',url,false);
+					        // 添加http头，发送信息至服务器时内容编码类型
+					        xhr.setRequestHeader('Content-Type','text/plain');
+					        xhr.onreadystatechange=function(){
+					            if (xhr.readyState==4){
+					                if (xhr.status==200 || xhr.status==304){
+					                    // console.log(xhr.responseText);
+					                    callback(xhr.responseText);
+					                }
+					            }
+					        }
+							console.log(data);
+					        xhr.send(data);
+					    }
+					};//end of ajax
+					
+					function getCurrentTime(){
+						return UI.mainPlayer.currentTime;
+					}
+					
+					function showSubtitle(responseText){
+						UI.subtitleLine.textContent=responseText;
+					}
+
+					function addToLearningArea(responseText){
+						let p= document.createElement("p");
+						let pTxt= document.createTextNode(responseText);
+						p.appendChild(pTxt);
+						UI.learningArea.appendChild(p);
+						//console.log("添加到学习区");
+					}
+					
+					function switchPlaybackRate(rate){
+						UI.mainPlayer.playbackRate = rate;
+						UI.rateSwitch.innerHTML=rate+"倍速";
+						//console.log(UI.mainPlayer.playbackRate);
+					}
+					
+					function controlButtons(){
+						UI.unknow.addEventListener("mousedown",function(){
+							//addToLearningArea("hello");
+							Ajax.post(" ",getCurrentTime(),addToLearningArea);
+						},false);
+						
+						//上下句要同时处理字幕和音频所以url与其他按钮不同
+						UI.lastPara.addEventListener("mousedown",function(){
+							console.log('切换上句字幕');
+							let curTime=getCurrentTime()+'last';
+							Ajax.post('/subSwitch',curTime=12,function(responseText){
+								showSubtitle(responseText);
+							});
+						},false);
+						UI.nextPara.addEventListener("mousedown",function(){
+							Ajax.post('/subSwitch',getCurrentTime()+'next',function(responseText){
+								showSubtitle(responseText);
+							});
+						},false);
+						
+						UI.subSwitch.addEventListener("mousedown",function(){
+							if(UI.subtitleLine.textContent==""){
+								Ajax.post('/subSwitch',getCurrentTime(),function(responseText){
+									showSubtitle(responseText);
+								});
+							}else{
+								UI.subtitleLine.textContent="";
+							}
+							
+						},false);
+						
+						//addEventListener 的第二个参数只能填匿名函数,不能直接填switchPlaybackRate();
+						UI.lowRate.addEventListener("mousedown",function(){
+							switchPlaybackRate(UI.lowRate.innerHTML.replace(/\p{Unified_Ideograph}+/u,""));
+						},false);
+						UI.normalRate.addEventListener("mousedown",function(){
+							switchPlaybackRate(UI.normalRate.innerHTML.replace(/\p{Unified_Ideograph}+/u,""));
+						},false);
+						UI.fastRate.addEventListener("mousedown",function(){
+							switchPlaybackRate(UI.fastRate.innerHTML.replace(/\p{Unified_Ideograph}+/u,""));
+						},false);
+					}//end of controlButtons
+					
+					controlButtons();
+					
+					//1毫秒刷新一次音频
+					/* setInterval(function(){
+						//console.log("刷新字幕");
+						Ajax.post(" ",getCurrentTime(),showSubtitle);
+					},1000); */
+				}
+		</script>
+	</head>
+	
+	<body>
+		<section class="shortcut" class="mainui">
+			<div class="navi">
+				<a href="../../index.html">首页</a>&gt;
+			<a href="../../CategoryIndex/CET.html">上一页</a>&gt;
+			2020-09-1
+			</div>
+		</section>
+		
+		<div id="app">
+			<div id="unknow">这句听不懂</div>
+			
+			<div id="playerContainer" _mediatype="audio">
+				<audio id="mainPlayer" controls onerror="alert('音频加载失败！\r\n如果刷新后仍然加载失败，可以尝试换浏览器或者重启路由器。')"  controls="controls" autoplay="autoplay" class="audioPlayer" src="../../speech/2019年12月第二套.mp3">
+					您使用的浏览器版本太旧，不支持音频播放，请使用Chrome等现代浏览器
+				</audio>
+			</div>
+			
+			<nav class="mainui">
+				<div id="lastPara" class="myButton">上一句</div>
+				<div id="nextPara" class="myButton">下一句</div>
+				<div id="subSwitch" class="myButton">字 幕</div>
+				<div id="rateMenu">
+					<li>
+						<a id="rateSwitch" class="myButton">倍 速</a>
+						<ul id="rateList">
+							<li><a id="lowRate" class="myButton">0.75倍速</a></li>
+							<li><a id="normalRate" class="myButton">1.0倍速</a></li>
+							<li><a id="fastRate" class="myButton">1.25倍速</a></li>
+						</ul>
+					</li>
+						
+				</div>
+			</nav>
+			
+			<div id="subtitleLine">
+				
+			</div>
+				
+			<div id="learningArea">
+				
+			</div>
+		</div>
+		
+	</body>
+</html>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<style>
+			html,body{
+				margin:0;
+				padding:0;
+			}
+			.Wrap{
+				max-width: 1400px;
+				margin: 0 auto;
+			}
+			.Header{
+				width: 100%;
+				height: 200px;
+				background-color: #038C5A;
+			}
+			.WrapMiddle{
+				width: 100%;
+				min-width: 500px;
+				font-size: 0;
+			}
+			.Left{
+				height: 625px;
+				background-color: #03A66A;
+				display: inline-block;
+				position: absolute;
+				left: -200px;
+				width: 200px;
+				font-size: .9rem;
+				transition: transform .3s;
+			}
+			@media (min-width :20rem){
+				.Left{
+					width: 20.833333%;
+					left: 0;
+					position: relative;
+				}
+			}
+			.Middle{
+				height: 625px;
+				width: 68.75%;
+				background-color: #bbbf90;
+				display: inline-block
+			}
+			.Right{
+				height: 625px;
+				width: 10.41666667%;
+				background-color: #03A66A;
+				display: inline-block;
+			}
+			.Footer{
+				height: 200px;
+				width: 100%;
+				background-color: #025059;
+			}
+			.FlexItems{
+				border: 1px solid #ebebeb;
+				background-color: #34005b;
+				display: flex;
+				height: 100px;
+			}
+			.FlexOne{
+				flex: 1.5 0 auto;
+			}
+			.FlexTwo,.FlexThree{
+				flex: 1 0 auto;
+			}
+		
+		</style>
+	</head>
+	<body>
+	<div class="Wrap">
+		<div class="Header">
+			<div class="FlexItems FlexOne">I am content in the inner Flexbox 1.</div>
+			<div class="FlexItems FlexTwo">I am content in the inner Flexbox 2.</div>
+			<div class="FlexItems FlexThree">I am content in the inner Flexbox 3.</div>
+		</div>
+		<div class="WrapMiddle">
+			<div class="Left"></div>
+			<div class="Middle"></div>
+			<div class="Right"></div>
+		</div>
+		<div class="Footer"></div>
+	</div>
+	</body>
+</html>
