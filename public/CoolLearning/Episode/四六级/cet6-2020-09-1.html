@@ -6,6 +6,9 @@
 		<link rel="stylesheet" href="../../css/common.css">
 		<link rel="stylesheet" href="../../css/listening.css" />
 		<style>
+			body{
+				overflow-x: hidden;
+			}
 			#app{
 				
 			}
@@ -16,7 +19,7 @@
 			  border-radius:5%;
 			  box-sizing: border-box ;
 			  border-bottom: 3px solid whitesmoke;
-			  padding: 5px;;
+			  padding: 5px;
 			  }
 			.myButton{
 			  cursor:pointer;
@@ -30,7 +33,8 @@
 				background:antiquewhite;
 			 }
 			#unknow{
-				height: 10%;
+				height: 3.125rem;
+				
 				background:limegreen;
 				color: white;
 				border-radius:3%;
@@ -38,6 +42,7 @@
 				text-align: center;
 				justify-content: center;
 				flex-direction: column;
+				cursor: pointer;
 			 }
 			 
 			.audioPlayer{
@@ -64,14 +69,29 @@
 			}
 			#subtitleLine{
 				line-height: 50px;
-				width: 100%;
+				padding: 10px;
 				color: #1AAD19;
 				border-bottom: 3px solid whitesmoke;
 			}
-			#learningArea p{
-				line-height: 40px;
+
+			#learningArea{
+				position: relative;
 				width: 100%;
-				border-bottom: 3px solid whitesmoke;
+				
+			}
+			#learningArea p{
+				float: left;
+				width: 90%;
+				line-height: 30px;
+				border-bottom: 2px solid whitesmoke;
+				font-size: 17px;
+			}
+			#learningArea img{
+				float: left;
+				width: 10%;
+				width: 22px;
+				height: 22px;
+				cursor: pointer;
 			}
 		</style>
 
@@ -97,13 +117,17 @@
 					}
 				}
 				var Model={
-					clock: undefined ,
+					close: true,
+					learningArr:[],
 					init:function(){
 						var body=UI.body;
 						var app=UI.app;
-						body.style.width= window.innerWidth  + "px" ;
-						body.style.height= window.innerHeight +"px"
-						app.style.height=body.style.height;
+						// body.style.width= window.innerWidth+"px";
+						// body.style.height= window.innerHeight +"px"
+						// app.style.height=body.style.height+'px';
+						// app.style.width=body.style.width+'px'
+						app.style.width= window.innerWidth+"px";
+						app.style.height= window.innerHeight+"px"
 						let myButton = document.getElementsByClassName("myButton") ;
 						for (let i=0; i < myButton.length ; i++){
 						   let bt = myButton[i];
@@ -153,54 +177,88 @@
 					UI.body.style.height=window.innerHeight+'px';
 					UI.body.style.width=window.innerWidth+'px';
 
-					var Ajax = {
-					    get: function(url,callback){
-					        // XMLHttpRequest对象用于在后台与服务器交换数据
-					        var xhr=new XMLHttpRequest();
-					        xhr.open('GET',url,false);
-					        xhr.onreadystatechange=function(){
-					            // readyState == 4说明请求已完成
-					            if(xhr.readyState==4){
-					                if(xhr.status==200 || xhr.status==304){
-					                    console.log(xhr.responseText);
-					                    callback(xhr.responseText);
-					                }
-					            }
-					        }
-					        xhr.send();
-					    },
-					    // data应为'a=a1&b=b1'这种字符串格式，在jq里如果data为对象会自动将对象转成这种字符串格式
-					    post: function(url,data,callback){
-					        var xhr=new XMLHttpRequest();
-					        xhr.open('POST',url,false);
-					        // 添加http头，发送信息至服务器时内容编码类型
-					        xhr.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
-					        xhr.onreadystatechange=function(){
-					            if (xhr.readyState==4){
-					                if (xhr.status==200 || xhr.status==304){
-					                    // console.log(xhr.responseText);
-					                    callback(xhr.responseText);
-					                }
-					            }
-					        }
-							console.log(data);
-					        xhr.send(data);
+					
+					controlButtons();
+					//2秒刷新一次音频
+					setInterval(function(){
+						if(!Model.close){
+							ajax({
+								url:"/subSwitch",
+								type:"POST",
+								async:true,
+								data:{
+									curTime:getCurrentTime()
+								},
+								success:function(data){
+									if(!Model.close&&data!==undefined)
+									showSubtitle(JSON.parse((data)).en);
+								}
+							})
+						}	
+					},2000);
+					
+					function ajax(options){
+					    var xhr = null;
+					    var params = formsParams(options.data);
+					    //创建对象
+					    if(window.XMLHttpRequest){
+					        xhr = new XMLHttpRequest()
+					    } else {
+					        xhr = new ActiveXObject("Microsoft.XMLHTTP");
 					    }
-					};//end of ajax
+					    // 连接
+					    if(options.type == "GET"){
+					        xhr.open(options.type,options.url + "?"+ params,options.async);
+					        xhr.send(null)
+					    } else if(options.type == "POST"){
+					        xhr.open(options.type,options.url,options.async);
+					        xhr.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+					        xhr.send(params);
+					    }
+					    xhr.onreadystatechange = function(){
+					        if(xhr.readyState == 4 && xhr.status == 200){
+					            options.success(xhr.responseText);
+					        }
+					    }
+					    function formsParams(data){
+					        var arr = [];
+					        for(var prop in data){
+					            arr.push(prop + "=" + data[prop]);
+					        }
+					        return arr.join("&");
+					    }
+					 
+					}//end of ajax
+					 
 					
 					function getCurrentTime(){
 						return UI.mainPlayer.currentTime;
 					}
 					
 					function showSubtitle(responseText){
-						UI.subtitleLine.textContent=responseText;
+						UI.subtitleLine.innerHTML=responseText;
 					}
-
+					
 					function addToLearningArea(responseText){
+						let div= document.createElement("div");
+						let pContainer= document.createElement("div");
 						let p= document.createElement("p");
 						let pTxt= document.createTextNode(responseText);
 						p.appendChild(pTxt);
-						UI.learningArea.appendChild(p);
+						pContainer.appendChild(p);
+						Model.learningArr.push(responseText);
+						
+						let btn=document.createElement("div");
+						let img=document.createElement("img");
+						img.src="../../img/ellipsis.png";
+						img.style.background
+						btn.appendChild(img);
+						
+						div.appendChild(pContainer);
+						div.appendChild(btn);
+						
+						div.style.width="100%";
+						UI.learningArea.appendChild(div);
 						//console.log("添加到学习区");
 					}
 					
@@ -211,31 +269,106 @@
 					}
 					
 					function controlButtons(){
+						//添加到学习区
 						UI.unknow.addEventListener("mousedown",function(){
 							//addToLearningArea("hello");
-							Ajax.post(" ",getCurrentTime(),addToLearningArea);
+							ajax({
+								url:"/subSwitch",
+								type:"POST",
+								async:true,
+								data:{
+									curTime:getCurrentTime()
+								},
+								success:function(data){
+									let dataObj=JSON.parse(data);
+									if(!Model.learningArr.includes(dataObj.en)){
+										addToLearningArea(dataObj.en);
+									}
+									
+								}
+							})
 						},false);
 						
-						//上下句要同时处理字幕和音频所以url与其他按钮不同
+						//上下句切换
 						UI.lastPara.addEventListener("mousedown",function(){
-							console.log('切换上句字幕');
-							Ajax.post('/subSwitch',getCurrentTime()+'last',function(responseText){
-								showSubtitle(responseText);
-							});
+							ajax({
+								url:"/subSwitch",
+								type:"POST",
+								async:true,
+								data:{
+									curTime:getCurrentTime()+'l'
+								},
+								success:function(data){
+									if(data!==undefined){
+										let dataObj=JSON.parse(data);
+										if(!Model.close){
+											showSubtitle(dataObj.en);
+										}
+										if(UI.mainPlayer.paused) 
+										UI.mainPlayer.play();
+										if(dataObj.sn!=0)
+										UI.mainPlayer.currentTime=parseFloat(dataObj.startTime);
+										else
+										UI.mainPlayer.currentTime=0;
+									}else{
+										showSubtitle('');
+									}
+									
+								}
+							})
 						},false);
 						UI.nextPara.addEventListener("mousedown",function(){
-							Ajax.post('/subSwitch',getCurrentTime()+'next',function(responseText){
-								showSubtitle(responseText);
-							});
+							ajax({
+								url:"/subSwitch",
+								type:"POST",
+								async:true,
+								data:{
+									curTime:getCurrentTime()+'n'
+								},
+								success:function(data){
+									if(data!==undefined){
+										let dataObj=JSON.parse(data);
+										if(!Model.close){
+											showSubtitle(dataObj.en);
+										}
+										if(UI.mainPlayer.paused) 
+										UI.mainPlayer.play();
+										if(dataObj.sn!=0)
+										UI.mainPlayer.currentTime=parseFloat(dataObj.startTime);
+										else
+										UI.mainPlayer.currentTime=0;
+									}else{
+										showSubtitle('');
+									}
+								}
+							})
 						},false);
 						
+						//字幕开关
 						UI.subSwitch.addEventListener("mousedown",function(){
-							if(UI.subtitleLine.textContent==""){
-								Ajax.post('/subSwitch',getCurrentTime(),function(responseText){
-									showSubtitle(responseText);
-								});
+							if(Model.close){
+								ajax({
+									url:"/subSwitch",
+									type:"POST",
+									async:true,
+									data:{
+										curTime:getCurrentTime()
+									},
+									success:function(data){
+										UI.subSwitch.innerHTML="字幕√";
+										Model.close=false;
+										if(data!==undefined){
+											let dataObj=JSON.parse(data);
+											showSubtitle(dataObj.en);
+										}else
+										showSubtitle('');
+										
+									}
+								})	
 							}else{
-								UI.subtitleLine.textContent="";
+								UI.subSwitch.innerHTML="字幕";
+								showSubtitle('');
+								Model.close=true;
 							}
 							
 						},false);
@@ -251,15 +384,8 @@
 							switchPlaybackRate(UI.fastRate.innerHTML.replace(/\p{Unified_Ideograph}+/u,""));
 						},false);
 					}//end of controlButtons
-					
-					controlButtons();
-					
-					//1毫秒刷新一次音频
-					/* setInterval(function(){
-						//console.log("刷新字幕");
-						Ajax.post(" ",getCurrentTime(),showSubtitle);
-					},1000); */
-				}
+						
+				}//end of window.onload
 		</script>
 	</head>
 	
